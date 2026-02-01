@@ -1,24 +1,22 @@
-// 1. Sidebar (Yon menyu) ochilib-yopilish mantiqi
+// 0. GEMINI SOZLAMASI (Kalitni shu yerga qo'ying)
+const GEMINI_API_KEY = "AIzaSyCkAu0MHo9WB20drSMwkojgfFEGcDmk0WY"; 
+
+// 1. Sidebar mantiqi
 function toggleSidebar() {
     const sidebar = document.getElementById('side-menu');
     const overlay = document.getElementById('overlay');
-    
     sidebar.classList.toggle('open');
     overlay.classList.toggle('show');
 }
 
-// 2. Sahifa yuklanganda foydalanuvchini tekshirish
+// 2. Sahifa yuklanganda ismni tekshirish
 window.onload = () => {
     const savedName = localStorage.getItem('userName');
-    
-    // Ism kiritilmagan bo'lsa, login modalini ko'rsatish
     if (!savedName) {
         document.getElementById('login-modal').style.display = 'flex';
     } else {
         document.getElementById('welcome-text').innerText = `Salom, ${savedName}!`;
     }
-    
-    // Chat oynasini oxirgi xabarga tushirish
     const chatBox = document.getElementById('chat-messages');
     chatBox.scrollTop = chatBox.scrollHeight;
 };
@@ -27,21 +25,18 @@ window.onload = () => {
 function loginUser() {
     const nameInput = document.getElementById('name-input');
     const name = nameInput.value.trim();
-    
     if (name) {
         localStorage.setItem('userName', name);
-        location.reload(); // Sahifani yangilab, ismni dashboardga chiqarish
+        location.reload();
     } else {
         alert("Iltimos, ismingizni kiriting!");
     }
 }
 
-// 4. Admin Panel mantiqi (Sherzod / Prince230367)
+// 4. Admin Panel (Sherzod / Prince230367)
 function openAdmin() {
-    // Sidebar ochiq bo'lsa yopamiz va login oynasini ochamiz
     const sidebar = document.getElementById('side-menu');
     if (sidebar.classList.contains('open')) toggleSidebar();
-    
     document.getElementById('admin-login-input').value = "";
     document.getElementById('admin-pass-input').value = "";
     document.getElementById('admin-auth-modal').style.display = 'flex';
@@ -50,84 +45,80 @@ function openAdmin() {
 function checkAdminAuth() {
     const login = document.getElementById('admin-login-input').value.trim();
     const pass = document.getElementById('admin-pass-input').value.trim();
-
-    // Login va Parol tekshiruvi
     if (login === 'Sherzod' && pass === 'Prince230367') {
         document.getElementById('admin-auth-modal').style.display = 'none';
-        showLogs(); // Xabarlar ro'yxatini chiqarish
+        showLogs();
     } else {
         alert("Login yoki Parol xato!");
     }
 }
 
-// 5. Admin uchun barcha foydalanuvchilar xabarlarini ko'rsatish
+// 5. Loglarni ko'rsatish
 function showLogs() {
     const container = document.getElementById('admin-logs-container');
     const logs = JSON.parse(localStorage.getItem('chatLogs') || '[]');
-    
     document.getElementById('admin-panel-section').style.display = 'flex';
-    container.innerHTML = ""; // Oldingi ma'lumotlarni tozalash
-
-    if (logs.length === 0) {
-        container.innerHTML = "<p style='color:gray; text-align:center;'>Xabarlar mavjud emas.</p>";
-    } else {
-        // Eng yangi xabarlarni tepada ko'rsatish
-        logs.reverse().forEach(item => {
-            container.innerHTML += `
-                <div class="log-item">
-                    <b>${item.ism}:</b> ${item.xabar}
-                    <small style="display:block; color:#555; font-size:0.7rem;">${item.vaqt}</small>
-                </div>`;
-        });
-    }
+    container.innerHTML = logs.length === 0 ? "<p>Xabarlar yo'q.</p>" : 
+        logs.reverse().map(item => `
+            <div class="log-item">
+                <b>${item.ism}:</b> ${item.xabar}
+                <small style="display:block; color:#555;">${item.vaqt}</small>
+            </div>`).join('');
 }
 
-// 6. Xabar yuborish mantiqi
-function sendMessage() {
+// 6. XABAR YUBORISH (Haqiqiy Gemini AI bilan)
+async function sendMessage() {
     const input = document.getElementById('user-input');
     const chatBox = document.getElementById('chat-messages');
     const msgText = input.value.trim();
     const userName = localStorage.getItem('userName') || "Mehmon";
 
     if (msgText) {
-        // Foydalanuvchi xabarini ekranga chiqarish
+        // Foydalanuvchi xabarini chiqarish
         const userDiv = document.createElement('div');
         userDiv.className = 'msg user-msg';
         userDiv.innerText = msgText;
         chatBox.appendChild(userDiv);
 
-        // Xabarni localStorage-ga log sifatida saqlash
+        // Logga saqlash
         let logs = JSON.parse(localStorage.getItem('chatLogs') || '[]');
-        logs.push({
-            ism: userName,
-            xabar: msgText,
-            vaqt: new Date().toLocaleString('uz-UZ')
-        });
+        logs.push({ ism: userName, xabar: msgText, vaqt: new Date().toLocaleString('uz-UZ') });
         localStorage.setItem('chatLogs', JSON.stringify(logs));
 
-        // Inputni tozalash va pastga tushirish
         input.value = '';
         chatBox.scrollTop = chatBox.scrollHeight;
 
-        // Botdan "Yuklanmoqda" effekti
-        setTimeout(() => {
-            const botDiv = document.createElement('div');
-            botDiv.className = 'msg bot-msg';
-            botDiv.innerText = "Xabaringiz qabul qilindi. Tez orada Gemini ulanadi!";
-            chatBox.appendChild(botDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }, 800);
+        // Bot o'ylayotgan holati
+        const botDiv = document.createElement('div');
+        botDiv.className = 'msg bot-msg';
+        botDiv.innerText = "Fikrlayapman...";
+        chatBox.appendChild(botDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        try {
+            // Haqiqiy Gemini API so'rovi
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: msgText }] }]
+                })
+            });
+
+            const data = await response.json();
+            const botResponse = data.candidates[0].content.parts[0].text;
+
+            // Bot javobini ekranda yangilash
+            botDiv.innerText = botResponse;
+        } catch (error) {
+            botDiv.innerText = "Xatolik: API kalit xato yoki internet ulanmagan.";
+        }
+        chatBox.scrollTop = chatBox.scrollHeight;
     }
 }
 
-// 7. Yordamchi mantiqlar
-function closeModal(id) {
-    document.getElementById(id).style.display = 'none';
-}
+function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-// "Enter" tugmasi orqali xabar yuborish
-document.getElementById('user-input').addEventListener('keypress', function (e) {
-    if (e.key === 'Enter') {
-        sendMessage();
-    }
+document.getElementById('user-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') sendMessage();
 });
