@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>All Bot AI - Mobile Experience</title>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --bg: #0f172a;
+            --sidebar-bg: #171717;
+            --text: #f8fafc;
+            --border: #334155;
+            --chat-bubble: #1e293b;
+        }
+
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: -apple-system, system-ui, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* SIDEBAR ChatGPT STYLE */
+        .sidebar {
+            position: fixed;
+            top: 0; left: -280px;
+            width: 280px; height: 100vh;
+            background: var(--sidebar-bg);
+            z-index: 1001;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+        }
+
+        .sidebar.open { left: 0; }
+
+        .overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.6);
+            display: none; z-index: 1000;
+            backdrop-filter: blur(3px);
+        }
+
+        .overlay.show { display: block; }
+
+        .sidebar-header {
+            display: flex; justify-content: space-between;
+            align-items: center; margin-bottom: 30px;
+        }
+
+        .nav-item {
+            width: 100%; padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            color: white; border-radius: 10px;
+            margin-bottom: 10px; cursor: pointer;
+            text-align: left; font-weight: 500;
+        }
+
+        .nav-item.active { background: var(--primary); border-color: var(--primary); }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1; display: flex; flex-direction: column;
+            width: 100%; position: relative;
+        }
+
+        header {
+            height: 60px; padding: 0 15px;
+            display: flex; align-items: center;
+            border-bottom: 1px solid var(--border);
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            gap: 15px;
+        }
+
+        .menu-btn {
+            background: none; border: none; color: white;
+            font-size: 1.5rem; cursor: pointer;
+        }
+
+        /* CHAT AREA */
+        .chat-box {
+            flex: 1; padding: 20px;
+            overflow-y: auto; display: flex;
+            flex-direction: column; gap: 15px;
+            padding-bottom: 100px;
+        }
+
+        .msg { padding: 12px 16px; border-radius: 18px; max-width: 85%; font-size: 0.95rem; line-height: 1.4; }
+        .bot-msg { background: var(--chat-bubble); align-self: flex-start; border-bottom-left-radius: 4px; }
+        .user-msg { background: var(--primary); align-self: flex-end; border-bottom-right-radius: 4px; }
+
+        /* INPUT AREA */
+        .input-area {
+            position: fixed; bottom: 0; width: 100%;
+            padding: 15px; background: var(--bg);
+            border-top: 1px solid var(--border);
+            display: flex; gap: 10px; align-items: center;
+        }
+
+        .input-wrapper {
+            flex: 1; background: #1e293b;
+            border-radius: 25px; padding: 5px 15px;
+            display: flex; align-items: center;
+            border: 1px solid var(--border);
+        }
+
+        .input-wrapper input {
+            flex: 1; background: none; border: none;
+            color: white; padding: 10px; outline: none; font-size: 1rem;
+        }
+
+        .send-btn {
+            width: 40px; height: 40px; background: var(--primary);
+            border: none; border-radius: 50%; color: white;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* MODALS */
+        .modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+            display: none; justify-content: center; align-items: center;
+            z-index: 2000; padding: 20px;
+        }
+
+        .modal-card {
+            background: var(--sidebar-bg); padding: 30px;
+            border-radius: 20px; width: 100%; max-width: 350px;
+            text-align: center; border: 1px solid var(--primary);
+        }
+
+        .modal-card input {
+            width: 100%; padding: 12px; margin: 10px 0;
+            border-radius: 10px; border: 1px solid var(--border);
+            background: #0f172a; color: white;
+        }
+
+        .primary-btn {
+            width: 100%; padding: 12px; background: var(--primary);
+            border: none; border-radius: 10px; color: white;
+            font-weight: bold; margin-top: 10px;
+        }
+
+        .logs-list {
+            height: 300px; overflow-y: auto; background: #000;
+            margin: 15px 0; padding: 10px; border-radius: 10px; text-align: left;
+        }
+
+        .log-item { padding: 8px; border-bottom: 1px solid #222; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+
+    <div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
+
+    <div id="side-menu" class="sidebar">
+        <div class="sidebar-header">
+            <h2 style="color: var(--primary)">All Bot AI</h2>
+            <button class="menu-btn" onclick="toggleSidebar()">&times;</button>
+        </div>
+        <button class="nav-item active">💬 Chat (Gemini)</button>
+        <button class="nav-item">🎨 Rasm Chizish</button>
+        <button class="nav-item">📥 Downloader</button>
+        
+        <div style="margin-top: auto;">
+            <button onclick="openAdmin()" style="background:none; border:none; color:gray; font-size:0.8rem; cursor:pointer;">🔑 Admin Panel</button>
+            <p style="font-size: 0.7rem; color: #10b981; margin-top: 5px;">● Tizim Online</p>
+        </div>
+    </div>
+
+    <main class="main-content">
+        <header>
+            <button class="menu-btn" onclick="toggleSidebar()">&#9776;</button>
+            <h3 id="welcome-text">Salom!</h3>
+        </header>
+
+        <div id="chat-messages" class="chat-box">
+            <div class="msg bot-msg">Salom! Men All Botman. Qanday yordam bera olaman?</div>
+        </div>
+
+        <div class="input-area">
+            <div class="input-wrapper">
+                <input type="text" id="user-input" placeholder="Xabarni yozing..." autocomplete="off">
+                <button class="send-btn" onclick="sendMessage()">➤</button>
+            </div>
+        </div>
+    </main>
+
+    <div id="login-modal" class="modal" style="display: flex;">
+        <div class="modal-card">
+            <h3>Xush kelibsiz!</h3>
+            <input type="text" id="name-input" placeholder="Ismingizni kiriting...">
+            <button onclick="loginUser()" class="primary-btn">Kirish</button>
+        </div>
+    </div>
+
+    <div id="admin-auth-modal" class="modal">
+        <div class="modal-card">
+            <h3>🔒 Admin Kirish</h3>
+            <input type="text" id="admin-login-input" placeholder="Login" autocomplete="off">
+            <input type="password" id="admin-pass-input" placeholder="Parol" autocomplete="new-password">
+            <button onclick="checkAdminAuth()" class="primary-btn">Tasdiqlash</button>
+            <button onclick="closeModal('admin-auth-modal')" style="background:none; border:none; color:gray; margin-top:10px;">Yopish</button>
+        </div>
+    </div>
+
+    <div id="admin-panel-section" class="modal">
+        <div class="modal-card" style="max-width: 500px;">
+            <h3>📩 Kelgan xabarlar</h3>
+            <div id="admin-logs-container" class="logs-list"></div>
+            <button onclick="closeModal('admin-panel-section')" class="primary-btn">Yopish</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            document.getElementById('side-menu').classList.toggle('open');
+            document.getElementById('overlay').classList.toggle('show');
+        }
+
+        window.onload = () => {
+            const name = localStorage.getItem('userName');
+            if (name) {
+                document.getElementById('login-modal').style.display = 'none';
+                document.getElementById('welcome-text').innerText = `Salom, ${name}!`;
+            }
+        };
+
+        function loginUser() {
+            const name = document.getElementById('name-input').value.trim();
+            if (name) {
+                localStorage.setItem('userName', name);
+                location.reload();
+            }
+        }
+
+        function openAdmin() {
+            toggleSidebar();
+            document.getElementById('admin-login-input').value = "";
+            document.getElementById('admin-pass-input').value = "";
+            document.getElementById('admin-auth-modal').style.display = 'flex';
+        }
+
+        function checkAdminAuth() {
+            const l = document.getElementById('admin-login-input').value;
+            const p = document.getElementById('admin-pass-input').value;
+            if (l === 'Sherzod' && p === 'Prince230367') {
+                document.getElementById('admin-auth-modal').style.display = 'none';
+                showLogs();
+            } else { alert("Xato!"); }
+        }
+
+        function showLogs() {
+            const container = document.getElementById('admin-logs-container');
+            const logs = JSON.parse(localStorage.getItem('chatLogs') || '[]');
+            document.getElementById('admin-panel-section').style.display = 'flex';
+            container.innerHTML = logs.reverse().map(i => `
+                <div class="log-item"><b>${i.ism}:</b> ${i.xabar}<br><small>${i.vaqt}</small></div>
+            `).join('');
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('user-input');
+            const box = document.getElementById('chat-messages');
+            if (input.value.trim()) {
+                const text = input.value.trim();
+                box.innerHTML += `<div class="msg user-msg">${text}</div>`;
+                
+                let logs = JSON.parse(localStorage.getItem('chatLogs') || '[]');
+                logs.push({ ism: localStorage.getItem('userName') || 'Mehmon', xabar: text, vaqt: new Date().toLocaleTimeString() });
+                localStorage.setItem('chatLogs', JSON.stringify(logs));
+
+                input.value = '';
+                box.scrollTop = box.scrollHeight;
+            }
+        }
+
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        
+        document.getElementById('user-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+    </script>
+</body>
+</html>
