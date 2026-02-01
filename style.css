@@ -1,13 +1,13 @@
-/* 1. Umumiy va O'zgaruvchilar */
+/* 1. Ranglar va O'zgaruvchilar */
 :root {
-    --primary: #3b82f6;          /* Ko'k rang */
+    --primary: #3b82f6;           /* Asosiy ko'k rang */
     --primary-hover: #2563eb;
-    --bg: #0f172a;               /* Asosiy qora fon */
-    --sidebar-bg: #171717;       /* Sidebar ChatGPT foni */
-    --text: #f8fafc;             /* Matn rangi */
-    --border: #334155;           /* Chiziqlar rangi */
-    --chat-bubble: #1e293b;      /* Bot xabari foni */
-    --safe-area: env(safe-area-inset-bottom); /* iPhone-lar uchun pastki bo'shliq */
+    --bg: #0f172a;                /* Sayt foni */
+    --sidebar-bg: #171717;        /* Sidebar foni */
+    --text: #f8fafc;              /* Matn rangi */
+    --border: #334155;            /* Chiziqlar rangi */
+    --chat-bubble: #1e293b;       /* Bot xabari foni */
+    --safe-area: env(safe-area-inset-bottom); /* iPhone uchun pastki bo'shliq */
 }
 
 * {
@@ -26,11 +26,11 @@ body {
     overflow: hidden;
 }
 
-/* 2. Sidebar (ChatGPT kabi chetdan chiqadigan) */
+/* 2. Sidebar (Yon menyu) */
 .sidebar {
     position: fixed;
     top: 0;
-    left: -280px; /* Default holatda yashirin */
+    left: -280px; /* Yashirin holat */
     width: 280px;
     height: 100vh;
     background: var(--sidebar-bg);
@@ -43,10 +43,10 @@ body {
 }
 
 .sidebar.open {
-    left: 0; /* Sidebar ochilganda */
+    left: 0; /* Ochilganda */
 }
 
-/* Overlay (Orqa fonni xiralashtirish) */
+/* Orqa fon xiralashishi */
 .overlay {
     position: fixed;
     inset: 0;
@@ -60,13 +60,6 @@ body {
     display: block;
 }
 
-.sidebar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-}
-
 .nav-item {
     width: 100%;
     padding: 12px 15px;
@@ -78,11 +71,6 @@ body {
     cursor: pointer;
     text-align: left;
     font-weight: 500;
-    transition: 0.2s;
-}
-
-.nav-item:active {
-    transform: scale(0.98);
 }
 
 .nav-item.active {
@@ -90,7 +78,7 @@ body {
     border-color: var(--primary);
 }
 
-/* 3. Asosiy Maydon (Main Content) */
+/* 3. Asosiy Chat Qismi */
 .main-content {
     flex: 1;
     display: flex;
@@ -116,10 +104,9 @@ header {
     color: white;
     font-size: 1.5rem;
     cursor: pointer;
-    padding: 5px;
 }
 
-/* 4. Chat Oynasi */
+/* 4. Chat Xabarlari Dizayni */
 .chat-box {
     flex: 1;
     padding: 20px 15px;
@@ -127,7 +114,7 @@ header {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    padding-bottom: 100px; /* Input ustiga chiqib ketmasligi uchun */
+    padding-bottom: 100px;
 }
 
 .msg {
@@ -153,7 +140,7 @@ header {
     box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
 }
 
-/* 5. Xabar Yozish Joyi (Input Area) */
+/* 5. Xabar yozish (Input Area) */
 .input-area {
     position: fixed;
     bottom: 0;
@@ -163,7 +150,6 @@ header {
     border-top: 1px solid var(--border);
     display: flex;
     gap: 10px;
-    align-items: center;
 }
 
 .input-wrapper {
@@ -196,16 +182,10 @@ header {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
     cursor: pointer;
-    transition: 0.2s;
 }
 
-.send-btn:active {
-    transform: scale(0.9);
-}
-
-/* 6. Modallar (Login, Admin) */
+/* 6. Modallar (Login va Admin) */
 .modal {
     position: fixed;
     inset: 0;
@@ -228,11 +208,6 @@ header {
     box-shadow: 0 20px 50px rgba(0,0,0,0.5);
 }
 
-.modal-card h3 {
-    margin-bottom: 15px;
-    color: var(--primary);
-}
-
 .modal-card input {
     width: 100%;
     padding: 14px;
@@ -241,7 +216,6 @@ header {
     border: 1px solid var(--border);
     background: #0f172a;
     color: white;
-    font-size: 1rem;
 }
 
 .primary-btn {
@@ -252,35 +226,15 @@ header {
     border-radius: 12px;
     color: white;
     font-weight: bold;
-    font-size: 1rem;
-    margin-top: 15px;
     cursor: pointer;
 }
 
-/* 7. Admin Xabarlar Logi */
+/* Admin Loglari uchun */
 .logs-list {
     height: 350px;
     overflow-y: auto;
-    background: #000000;
+    background: #000;
     margin: 20px 0;
     padding: 12px;
     border-radius: 12px;
-    text-align: left;
-    border: 1px solid #222;
-}
-
-.log-item {
-    padding: 12px;
-    border-bottom: 1px solid #111;
-    font-size: 0.9rem;
-}
-
-.log-item b {
-    color: var(--primary);
-}
-
-.log-item small {
-    color: #555;
-    display: block;
-    margin-top: 4px;
 }
