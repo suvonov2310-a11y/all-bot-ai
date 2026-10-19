@@ -1,27 +1,20 @@
-# Suniy AI
+# All-Bot AI
 
-O‘zbekiston uchun yaratilgan sun’iy intellekt asosidagi Telegram boti.
+Bir nechta AI agentlarni birlashtirgan multi-agent tizim.
 
 ## Loyiha haqida
-Suniy AI — foydalanuvchilarga turli savollarga javob berish, matnlarni tahlil qilish va yordam ko‘rsatish uchun mo‘ljallangan AI yordamchisi.
+Bu loyiha turli xil vazifalarni bajaruvchi AI botlarni bir platformada birlashtirishga qaratilgan. Har bir bot o‘ziga xos xususiyatga ega.
 
 ## Asosiy imkoniyatlar
-- Matn asosida savol-javob
-- O‘zbek va ingliz tillarida ishlash
-- Telegram orqali qulay interfeys
+- Bir nechta AI agentlarni boshqarish
+- Telegram integratsiyasi
+- Turli xil persona va vazifalar
 
 ## Texnologiyalar
-- Python
+- JavaScript / Node.js
 - Telegram Bot API
-- Large Language Models (LLM)
-
-## Ishga tushirish
-1. Repository’ni clone qiling
-2. `.env` fayliga bot tokenini qo‘ying
-3. Kerakli kutubxonalarni o‘rnating: `pip install -r requirements.txt`
-4. Botni ishga tushiring: `python main.py`
+- AI model integratsiyasi
 
 ## Muallif
 **Sherzod Suvonov Alijonovich**  
-AI Developer | Student at TSUE  
-Medium: [medium.com/@suvonov2310](https://medium.com/@suvonov2310)
+Building multi-agent AI systems on Telegram
